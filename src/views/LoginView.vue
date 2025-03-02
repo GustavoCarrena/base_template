@@ -13,10 +13,10 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import router from "@/router"
   import { useLogin } from '@/composables/auth.js'
-  import { setAuthToLocalStorage } from "@/helpers/auth"
+  import { setAuthToLocalStorage, deleteAuthFromLocalStorage } from "@/helpers/auth"
   import { loginFormSchema } from '@/helpers/validations'
   import { showError } from '@/helpers/toast.js'
   import Toast from 'primevue/toast';
@@ -32,22 +32,27 @@
     password: '',
   })
 
-  const { isPending, mutateAsync: login } = useLogin()
+  const { isPending, mutateAsync: login, onSuccess } = useLogin()
 
   const handleLogin = async ({ states: { username, password }, valid }) => {
     if (valid) {
       try {
         const response = await login({ username: username.value, password: password.value })
-        setAuthToLocalStorage(response)
+        await setAuthToLocalStorage(response)
         router.replace({ name: 'home' })
       } catch (error) {
         showError({ message: 'Usuario o Contraseña incorrectos', summary: 'Error' }, toast)
+        deleteAuthFromLocalStorage()
       }
     }
 
   }
 
   const resolver = yupResolver(loginFormSchema);
+
+  onMounted(() => {
+    deleteAuthFromLocalStorage()
+  })
 
 </script>
 
