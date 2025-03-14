@@ -12,5 +12,6 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[vue]": {
     "editor.defaultFormatter": "Vue.volar"
-  }
+  },
+  "prettier.requireConfig": true
 }
