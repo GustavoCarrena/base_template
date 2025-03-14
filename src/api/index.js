@@ -8,6 +8,7 @@ import router from "@/router"
 const auth = getAuthFromLocalStorage()
 const loginUrl = ENV.VITE_BASE_URL
 let isRenewToken = false
+const projectUseRefreshToken = false
 
 export const api = axios.create({
   baseURL:`${loginUrl}`,
@@ -25,31 +26,33 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+const noRefreshTokenActions = ()=>{
+  deleteAuthFromLocalStorage()
+  router.replace({ name: 'login' })
+  return Promise.reject("No refresh token available");
+}
+
 const handleLoginWithRefreshToken = async (originalRequest) => {
  const auth = getAuthFromLocalStorage()
  const refreshToken = auth?.refreshToken
-  if (!refreshToken) {
-    deleteAuthFromLocalStorage()
-    router.replace({ name: 'login' })
-    return Promise.reject("No refresh token available");
-  }
-  try {
-   const data = await authService.refreshToken(refreshToken)
-   if(data.token){
-    setAuthToLocalStorage({
-      token: data.token,
-      refreshtoken: data.refreshToken
-    })
-    originalRequest.headers.Authorization = `Bearer ${data.token}`
-    return api(originalRequest)
+  if (!refreshToken || !projectUseRefreshToken) {
+    noRefreshTokenActions()
+    return
+  } else{
+    try {
+     const data = await authService.refreshToken(refreshToken)
+     if(data.token){
+      setAuthToLocalStorage({
+        token: data.token,
+        refreshtoken: data.refreshToken
+      })
+      originalRequest.headers.Authorization = `Bearer ${data.token}`
+      return api(originalRequest)
+      }
+    } catch (error) {
+      noRefreshTokenActions()
     }
-  } catch (error) {
-     console.error("Refresh token failed:", error)
-    deleteAuthFromLocalStorage()
-    router.replace({ name: 'login' })
-    return Promise.reject("No refresh token available");
   }
-
 }
 
 const handleRequestSuccess = (response) => response
