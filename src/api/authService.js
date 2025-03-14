@@ -2,13 +2,13 @@ import {api} from './index'
 
 const authService = {
   login: async (payload) => {
-    const response = await api.post('/login', payload)
-    return response
+    const {data} = await api.post('/login', payload)
+    return data
   },
 
   refreshToken: async(refreshToken) => {
-    const response = await api.post('/login/refresh-token', { refreshToken })
-    return response
+    const {data} = await api.post('/refresh-token', { refreshToken })
+    return data
   }
 }
 
