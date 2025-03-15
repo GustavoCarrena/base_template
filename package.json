@@ -12,7 +12,8 @@
     "build:test": "vite build --mode test",
     "preview": "vite preview",
     "lint": "eslint --fix .",
-    "lint:check": "eslint ."
+    "lint:check": "eslint .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@primeuix/themes": "^1.0.0",
@@ -20,6 +21,7 @@
     "@tailwindcss/vite": "^4.0.9",
     "@tanstack/vue-query": "^5.66.11",
     "axios": "^1.8.1",
+    "globals": "^16.0.0",
     "pinia": "^3.0.1",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.4",
